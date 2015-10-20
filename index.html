@@ -179,7 +179,7 @@ resample_flow &lt;-<span class="st"> </span>function(<span class="dt">data=</spa
   
   random_df &lt;-<span class="st"> </span><span class="kw">sample</span>(data, <span class="dt">replace=</span>T)
   
-  <span class="kw">quantile</span>(random_df, flow_pct)[[<span class="dv">1</span>]]
+  <span class="kw">quantile</span>(random_df, flow_pct, <span class="dt">na.rm=</span>T)[[<span class="dv">1</span>]]
   
 }
 
@@ -220,8 +220,9 @@ boot_low_flow &lt;-<span class="st"> </span>function(<span class="dt">data=</spa
 <span class="co"># Use `group_by` to send data for each site to your boot function</span>
 low_flows &lt;-<span class="st"> </span><span class="kw">group_by</span>(df, AQS_ID) %&gt;%<span class="st"> </span>
 <span class="st">             </span><span class="kw">mutate</span>(<span class="dt">boot_results =</span> <span class="kw">boot_low_flow</span>(Flow, <span class="dt">flow_pct=</span><span class="fl">0.10</span>, <span class="dt">conf_int=</span><span class="fl">0.95</span>)) %&gt;%
-<span class="st">             </span><span class="kw">summarize</span>(<span class="dt">LCL95_low_flow  =</span> <span class="kw">unlist</span>(boot_results[<span class="dv">1</span>])[[<span class="dv">1</span>]], 
-                       <span class="dt">Low_flow        =</span> <span class="kw">unlist</span>(boot_results[<span class="dv">1</span>])[[<span class="dv">2</span>]], 
+<span class="st">             </span><span class="kw">summarize</span>(<span class="dt">low_flow_10pct  =</span>  <span class="kw">quantile</span>(Flow, <span class="fl">0.10</span>, <span class="dt">na.rm=</span>T)[[<span class="dv">1</span>]],
+                       <span class="dt">LCL95_low_flow  =</span> <span class="kw">unlist</span>(boot_results[<span class="dv">1</span>])[[<span class="dv">1</span>]], 
+                       <span class="dt">Boot_low_flow   =</span> <span class="kw">unlist</span>(boot_results[<span class="dv">1</span>])[[<span class="dv">2</span>]], 
                        <span class="dt">UCL95_low_flow  =</span> <span class="kw">unlist</span>(boot_results[<span class="dv">1</span>])[[<span class="dv">3</span>]])  </code></pre>
 </div>
 <div id="results" class="section level2">
@@ -231,20 +232,23 @@ low_flows &lt;-<span class="st"> </span><span class="kw">group_by</span>(df, AQS
 <thead>
 <tr class="header">
 <th align="right">AQS_ID</th>
+<th align="right">low_flow_10pct</th>
 <th align="right">LCL95_low_flow</th>
-<th align="right">Low_flow</th>
+<th align="right">Boot_low_flow</th>
 <th align="right">UCL95_low_flow</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="right">270535501</td>
+<td align="right">0.000640</td>
 <td align="right">0.00064</td>
 <td align="right">0.000640</td>
 <td align="right">0.103216</td>
 </tr>
 <tr class="even">
 <td align="right">270535502</td>
+<td align="right">0.000716</td>
 <td align="right">0.00044</td>
 <td align="right">0.000716</td>
 <td align="right">0.005214</td>
