@@ -157,7 +157,7 @@ img {
 </div>
 <div id="bootstrapping" class="section level2">
 <h2>Bootstrapping</h2>
-<p>We currently use the <code>EnvStats</code> package to generate our summary values. It has built in functions to accunt for non-detect data and allows for different distributions. However, <code>EnvStats</code> doesn’t seem to provide percentile results, so if you’re not dealing with non-detects it’s probably simple enough to boot things yourself.</p>
+<p>We currently use the <code>EnvStats</code> package to generate our summary values. It has built in functions to accunt for non-detect data and allows for different distributions. However, if you’re not dealing with non-detects it’s probably simple enough to boot things yourself.</p>
 <p>Before you start you’ll want to set the random number generator to ensure you’ll be able to reproduce your results. I’ll use <code>#27</code> below.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">27</span>)</code></pre>
 <p></br><br />The general idea is to take a random sample from the data set, generate the statistic that you’re interested in, record it, then rinse and repeat. Below is the code for how to resample a single site.</p>
