@@ -46,7 +46,7 @@ kable(df)
 
 ## Bootstrapping
 
-We currently use the `EnvStats` package to generate our summary values. It has built in functions to accunt for non-detect data and allows for different distributions. However, `EnvStats` doesn't seem to provide percentile results, so if you're not dealing with non-detects it's probably simple enough to boot things yourself.
+We currently use the `EnvStats` package to generate our summary values. It has built in functions to accunt for non-detect data and allows for different distributions. However, if you're not dealing with non-detects it's probably simple enough to boot things yourself.
 
 
 Before you start you'll want to set the random number generator to ensure you'll be able to reproduce your results. I'll use `#27` below.
