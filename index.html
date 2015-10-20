@@ -167,65 +167,62 @@ df_site1 &lt;-<span class="st"> </span><span class="kw">filter</span>(df, AQS_ID
 <span class="co"># Pull random sample</span>
 <span class="co"># `replace=T` allows for the same value to be pulled multiple times</span>
 <span class="co"># `size=nrow(df)` ensures the number of observations in the new table to match the original </span>
-random_df &lt;-<span class="st"> </span><span class="kw">sample_n</span>(df, <span class="dt">replace=</span>T, <span class="dt">size=</span><span class="kw">nrow</span>(df))
+random_df &lt;-<span class="st"> </span><span class="kw">sample</span>(df_site1$Flow, <span class="dt">replace=</span>T)
   
 <span class="co"># Generate summary statistic</span>
-<span class="kw">quantile</span>(random_df$Flow, <span class="fl">0.1</span>)</code></pre>
+<span class="kw">quantile</span>(random_df, <span class="fl">0.1</span>)</code></pre>
 <pre><code>##     10% 
 ## 0.00064</code></pre>
 <p>To repeat this 3,000 times we can wrap these steps into a <code>resample</code> function, and then use <code>sapply</code> to collect the results.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create  resample function</span>
-resample_flow &lt;-<span class="st"> </span>function(<span class="dt">data=</span>df, <span class="dt">flow_pct=</span><span class="fl">0.10</span>){
+resample_flow &lt;-<span class="st"> </span>function(<span class="dt">data=</span> df_site1$Flow, <span class="dt">flow_pct=</span> <span class="fl">0.10</span>){
   
-  random_df &lt;-<span class="st"> </span><span class="kw">sample_n</span>(df, <span class="dt">replace=</span>T, <span class="dt">size=</span><span class="kw">nrow</span>(df))
+  random_df &lt;-<span class="st"> </span><span class="kw">sample</span>(data, <span class="dt">replace=</span>T)
   
-  <span class="kw">quantile</span>(random_df$Flow, flow_pct)[[<span class="dv">1</span>]]
+  <span class="kw">quantile</span>(random_df, flow_pct)[[<span class="dv">1</span>]]
   
 }
 
 <span class="co"># Repeat using `sapply`</span>
 repeats &lt;-<span class="st"> </span><span class="dv">3000</span>
 
-booted_10pct &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span>:repeats, <span class="dt">FUN=</span>function(x) <span class="kw">resample_flow</span>(df_site1))
+booted_10pct &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span>:repeats, <span class="dt">FUN=</span>function(x) <span class="kw">resample_flow</span>(df_site1$Flow))
 
 <span class="co"># The 50th percentile or median low flow</span>
-<span class="kw">median</span>(booted_10pct)</code></pre>
-<pre><code>## [1] 6e-04</code></pre>
+<span class="kw">median</span>(booted_10pct, <span class="dt">na.rm=</span>T)</code></pre>
+<pre><code>## [1] 0.00064</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Return the 95th percentile of the booted low flows</span>
-<span class="kw">quantile</span>(booted_10pct, <span class="fl">0.95</span>)[[<span class="dv">1</span>]]</code></pre>
-<pre><code>## [1] 0.00113</code></pre>
+<span class="kw">quantile</span>(booted_10pct, <span class="fl">0.95</span>, <span class="dt">na.rm=</span>T)[[<span class="dv">1</span>]]</code></pre>
+<pre><code>## [1] 0.00148</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Force the 95th percentile to be a recorded value</span>
 <span class="kw">sort</span>(booted_10pct)[repeats*.<span class="dv">95</span> +<span class="dv">1</span>]</code></pre>
-<pre><code>## [1] 0.00113</code></pre>
+<pre><code>## [1] 0.00148</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Upper and lower confidence interval around the median</span>
-<span class="kw">quantile</span>(booted_10pct, <span class="kw">c</span>(<span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>))</code></pre>
+<span class="kw">quantile</span>(booted_10pct, <span class="kw">c</span>(<span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>), <span class="dt">na.rm=</span>T)</code></pre>
 <pre><code>##     2.5%      50%    97.5% 
-## 0.000440 0.000600 0.001144</code></pre>
+## 0.000640 0.000640 0.103216</code></pre>
 </div>
 <div id="automate" class="section level2">
 <h2>Automate</h2>
 <p>To finish up, throw these steps into your personal <code>boot</code> function, and then run it on each site using <code>group_by</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create boot function</span>
-boot_low_flow &lt;-<span class="st"> </span>function(<span class="dt">data=</span>df, <span class="dt">flow_pct=</span><span class="fl">0.10</span>, <span class="dt">conf_int=</span><span class="fl">0.95</span>, <span class="dt">repeats=</span><span class="dv">3000</span>){
+boot_low_flow &lt;-<span class="st"> </span>function(<span class="dt">data=</span>df$Flow, <span class="dt">flow_pct=</span><span class="fl">0.10</span>, <span class="dt">conf_int=</span><span class="fl">0.95</span>, <span class="dt">repeats=</span><span class="dv">3000</span>){
 
   alpha &lt;-<span class="st"> </span>(<span class="dv">1</span> -<span class="st"> </span>conf_int)/<span class="dv">2</span>
   
-  booted_10pct &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span>:repeats, <span class="dt">FUN=</span>function(x) <span class="kw">resample_flow</span>(df, flow_pct))
+  booted_10pct &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span>:repeats, <span class="dt">FUN=</span>function(x) <span class="kw">resample_flow</span>(data, flow_pct))
 
   <span class="co"># Upper and lower confidence interval around the median</span>
-  <span class="kw">list</span>(<span class="kw">quantile</span>(booted_10pct, <span class="kw">c</span>(alpha, <span class="fl">0.5</span>, <span class="dv">1</span>-alpha)))
-  
-  <span class="co">#Your final result</span>
-  
-  
+  <span class="kw">list</span>(<span class="kw">quantile</span>(booted_10pct, <span class="kw">c</span>(alpha, <span class="fl">0.5</span>, <span class="dv">1</span>-alpha), <span class="dt">na.rm=</span>T))
+
 }
 
 <span class="co"># Use `group_by` to send data for each site to your boot function</span>
 low_flows &lt;-<span class="st"> </span><span class="kw">group_by</span>(df, AQS_ID) %&gt;%<span class="st"> </span>
-<span class="st">             </span><span class="kw">mutate</span>(<span class="dt">boot_results =</span> <span class="kw">boot_low_flow</span>())  %&gt;%
-<span class="st">             </span><span class="kw">summarize</span>(<span class="dt">LCL95_low_flow =</span> <span class="kw">unlist</span>(boot_results)[[<span class="dv">1</span>]], 
-                       <span class="dt">low_flow       =</span> <span class="kw">unlist</span>(boot_results)[[<span class="dv">2</span>]], 
-                       <span class="dt">UCL95_low_flow =</span> <span class="kw">unlist</span>(boot_results)[[<span class="dv">3</span>]])  </code></pre>
+<span class="st">             </span><span class="kw">mutate</span>(<span class="dt">boot_results =</span> <span class="kw">boot_low_flow</span>(Flow, <span class="dt">flow_pct=</span><span class="fl">0.10</span>, <span class="dt">conf_int=</span><span class="fl">0.95</span>)) %&gt;%
+<span class="st">             </span><span class="kw">summarize</span>(<span class="dt">LCL95_low_flow  =</span> <span class="kw">unlist</span>(boot_results[<span class="dv">1</span>])[[<span class="dv">1</span>]], 
+                       <span class="dt">Low_flow        =</span> <span class="kw">unlist</span>(boot_results[<span class="dv">1</span>])[[<span class="dv">2</span>]], 
+                       <span class="dt">UCL95_low_flow  =</span> <span class="kw">unlist</span>(boot_results[<span class="dv">1</span>])[[<span class="dv">3</span>]])  </code></pre>
 </div>
 <div id="results" class="section level2">
 <h2>Results</h2>
@@ -235,22 +232,22 @@ low_flows &lt;-<span class="st"> </span><span class="kw">group_by</span>(df, AQS
 <tr class="header">
 <th align="right">AQS_ID</th>
 <th align="right">LCL95_low_flow</th>
-<th align="right">low_flow</th>
+<th align="right">Low_flow</th>
 <th align="right">UCL95_low_flow</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="right">270535501</td>
-<td align="right">0.00044</td>
-<td align="right">6e-04</td>
-<td align="right">0.001144</td>
+<td align="right">0.00064</td>
+<td align="right">0.000640</td>
+<td align="right">0.103216</td>
 </tr>
 <tr class="even">
 <td align="right">270535502</td>
 <td align="right">0.00044</td>
-<td align="right">6e-04</td>
-<td align="right">0.001144</td>
+<td align="right">0.000716</td>
+<td align="right">0.005214</td>
 </tr>
 </tbody>
 </table>
