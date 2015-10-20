@@ -23,7 +23,6 @@ library(readr)
 ```
 
 ## Data Table
-
 Our data is organized by monitoring site and date. Here's a sample.
 
 ```{r kable, message=F, echo=F}
