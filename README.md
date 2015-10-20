@@ -14,17 +14,18 @@ library(EnvStats)
 Our data is organized by monitoring site and pollutant. Here's a sample.
 
 
-    AQS_ID  Date         Pollutant    Concentration
-----------  -----------  ----------  --------------
- 270535501  2009-07-30   Lead               0.00148
- 270535501  2009-07-30   Selenium           0.00064
- 270535501  2009-07-30   Iron               0.34256
- 270535501  2009-07-30   Chromium           0.00064
- 270535502  2009-07-30   Aluminum           0.26219
- 270535502  2009-07-30   Manganese          0.01113
- 270535502  2009-07-30   Nickel             0.00044
- 270535502  2009-07-30   Antimony           0.00127
- 270535502  2009-07-30   Arsenic            0.00113
+    AQS_ID  Date         Pollutant    Concentration  
+----------  -----------  ----------  --------------  
+ 270535501  2009-07-30   Lead               0.00148  
+ 270535501  2009-07-30   Selenium           0.00064  
+ 270535501  2009-07-30   Iron               0.34256  
+ 270535501  2009-07-30   Chromium           0.00064  
+ 270535502  2009-07-30   Aluminum           0.26219  
+ 270535502  2009-07-30   Manganese          0.01113  
+ 270535502  2009-07-30   Nickel             0.00044  
+ 270535502  2009-07-30   Antimony           0.00127  
+ 270535502  2009-07-30   Arsenic            0.00113    
+   
 
 ## Bootstrapping
 
