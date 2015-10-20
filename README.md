@@ -79,7 +79,7 @@ resample_flow <- function(data= df_site1$Flow, flow_pct= 0.10){
   
   random_df <- sample(data, replace=T)
   
-  quantile(random_df, flow_pct)[[1]]
+  quantile(random_df, flow_pct, na.rm=T)[[1]]
   
 }
 
@@ -123,8 +123,9 @@ boot_low_flow <- function(data=df$Flow, flow_pct=0.10, conf_int=0.95, repeats=30
 # Use `group_by` to send data for each site to your boot function
 low_flows <- group_by(df, AQS_ID) %>% 
              mutate(boot_results = boot_low_flow(Flow, flow_pct=0.10, conf_int=0.95)) %>%
-             summarize(LCL95_low_flow  = unlist(boot_results[1])[[1]], 
-                       Low_flow        = unlist(boot_results[1])[[2]], 
+             summarize(low_flow_10pct  =  quantile(Flow, 0.10, na.rm=T)[[1]],
+                       LCL95_low_flow  = unlist(boot_results[1])[[1]], 
+                       Boot_low_flow   = unlist(boot_results[1])[[2]], 
                        UCL95_low_flow  = unlist(boot_results[1])[[3]])  
 ```
 
