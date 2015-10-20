@@ -1,14 +1,4 @@
 # Bootstrapping confidence intervals
-  
-<style type="text/css">
-  body, td {font-size: 16px;}
-  code.r{font-size: 16px;}
-  pre {font-size: 16px} 
-</style>
-  
-  This R file finds the age distributions of the MNDOT registered vehicles
-after they have been sorted by vehicle class.
-
 
 ## Packages
 
