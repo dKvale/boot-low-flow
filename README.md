@@ -8,13 +8,6 @@ output:
     toc_depth: 3
 ---
   
-<style type="text/css">
-  body, td {font-size: 18px;}
-  code.r{font-size: 18px;}
-  pre {font-size: 18px} 
-</style>
-
-
 ## Packages
 ```{r message=F}
 library(dplyr)
@@ -54,15 +47,17 @@ set.seed(27)
 ```
 
 </br>  
-The general idea is to take a random sample from the data set, generate the statistic that you're interested in, record it, then rinse and repeat. Below is the code for how to resample a single site.
+The general idea is to take a random sample from the data set, generate the statistic that you're interested in, record it, then rinse and repeat. 
+
+Below is the code for how to resample a single site.
+
 ```{r message=F}
 
 # Filter data to a single site
 df_site1 <- filter(df, AQS_ID == AQS_ID[1])
 
 # Pull random sample
-# `replace=T` allows for the same value to be pulled multiple times
-# `size=nrow(df)` ensures the number of observations in the new table to match the original 
+# replace=T allows for the same value to be pulled multiple times
 random_df <- sample(df_site1$Flow, replace=T)
   
 # Generate summary statistic
